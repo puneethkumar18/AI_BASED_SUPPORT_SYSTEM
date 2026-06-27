@@ -3,11 +3,12 @@ from app.schemas.comment import CommentCreate
 from app.models.comment import Comment
 from app.models.ticket import Ticket
 from app.models.user import User
+from app.services.email_services import EmailServices
 
 class CommentServices:
 
     @staticmethod
-    def add_comment(db:Session,ticket:Ticket,current_user:User,comment_data:CommentCreate):
+    async def add_comment(db:Session,ticket:Ticket,current_user:User,comment_data:CommentCreate):
         comment = Comment(
             message = comment_data.message,
             ticket_id=ticket.id,
@@ -17,6 +18,13 @@ class CommentServices:
         db.add(comment)
         db.commit()
         db.refresh(comment)
+
+        await EmailServices.send_mail(
+            recipient="puneethkumar96@gmail.com",
+            subject="New Comment on Your Ticket",
+            body=comment.message
+        )
+
         return comment
     
     @staticmethod

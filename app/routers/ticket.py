@@ -16,11 +16,11 @@ router = APIRouter(
 
 
 @router.post("",response_model=TicketResponse,status_code=status.HTTP_201_CREATED)
-def create_ticket(
+async def create_ticket(
     ticket:TicketCreate,
     db:Session = Depends(get_db),
     current_user:User=Depends(require_roles(RoleEnum.ADMIN,RoleEnum.CUSTOMER))):
-    return TicketServices.create_ticket(db,ticket,current_user)
+    return await TicketServices.create_ticket(db,ticket,current_user)
 
 @router.get("/my",response_model=List[TicketResponse])
 def get_my_tickets(current_user:User=Depends(get_current_user),db:Session=Depends(get_db)):

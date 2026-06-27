@@ -3,13 +3,14 @@ from sqlalchemy.orm import Session
 from app.models.user import User
 from app.services.ai_sevices import AIServices
 from app.services.history_service import HistorySevices
+from app.services.email_services import EmailServices
 from app.models.ticket import Ticket
 from app.core.enums import RoleEnum
 
 class TicketServices:
 
     @staticmethod
-    def create_ticket(db:Session,ticket_data:TicketCreate,current_user:User):
+    async def create_ticket(db:Session,ticket_data:TicketCreate,current_user:User):
         # ticket = Ticket(
         #     title=ticket_data.title,
         #     description = ticket_data.description,
@@ -24,7 +25,17 @@ class TicketServices:
             suggested_resolution=analysis["suggested_resolution"],
             created_by = current_user.id
         )
-        
+        await EmailServices.send_mail(
+            recipient="puneethkumarg96@gmail.com",
+            subject="Ticket Created Successfully",
+            body=f"""
+                <h2>Ticket Created</h2>
+                Ticket #{ticket.id}
+                Title : {ticket.title}
+                Status : {ticket.status}
+                """
+        )
+
         db.add(ticket)
         db.commit()
         db.refresh(ticket)
@@ -36,6 +47,8 @@ class TicketServices:
             ticket_id=ticket.id,
             new_value= ticket.title
         )
+        
+
         return ticket
 
     @staticmethod
@@ -49,7 +62,7 @@ class TicketServices:
         return tickets
 
     @staticmethod
-    def update_ticket(db:Session,ticket:Ticket,ticket_data:TicketUpdate,current_user_id:int):
+    async def update_ticket(db:Session,ticket:Ticket,ticket_data:TicketUpdate,current_user_id:int):
         old_status = ticket.status
         update_data = ticket_data.model_dump(exclude_unset=True)
         for key, value in update_data.items():
@@ -67,10 +80,19 @@ class TicketServices:
             old_value=old_status,
             new_value=ticket.status
             )
+            await EmailServices.send_mail(
+                recipient="puneethkumarg96@gmail.com",
+                subject="Ticket Status Updated",
+                body= f"""
+                    Ticket #{ticket.id}
+                    Status changed to
+                    {ticket.status}
+                    """
+                )
         return ticket
     
     @staticmethod
-    def assign_ticket(db:Session,ticket: Ticket,assigned_user_id: int,current_user_id:int):
+    async def assign_ticket(db:Session,ticket: Ticket,assigned_user_id: int,current_user_id:int):
         agent = (db.query(User).filter(User.id == assigned_user_id).first())
         if agent is None:
             raise ValueError("Support agent not found.")
@@ -89,4 +111,13 @@ class TicketServices:
             old_value=str(ticket.assiged_to),
             new_value=str(agent.id)
         )
+
+        await EmailServices.send_email(
+                recipient="puneethkumarg96@gmail.com",
+                subject="New Ticket Assigned",
+                body=f"""
+                Ticket #{ticket.id}
+                has been assigned to you.
+                """
+            )
         return ticket
