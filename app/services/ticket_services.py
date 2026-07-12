@@ -8,6 +8,7 @@ from app.models.ticket import Ticket
 from app.core.enums import RoleEnum
 from app.core.logger import logger
 from fastapi import BackgroundTasks
+from app.services.cache_services import CacheService
 
 class TicketServices:
 
@@ -35,7 +36,7 @@ class TicketServices:
         db.add(ticket)
         db.commit()
         db.refresh(ticket)
-
+        CacheService.delete("dashboard_summary")
         background_tasks.add_task(
             logger.info,
             "AI categorized ticket %s as %s",
@@ -79,13 +80,13 @@ class TicketServices:
         #     ticket.id,
         #     current_user.id
         # )
-        HistorySevices.log_history(
-            db=db,
-            action="TICKET CREATED",
-            user_id=current_user.id,
-            ticket_id=ticket.id,
-            new_value= ticket.title
-        )
+        # HistorySevices.log_history(
+        #     db=db,
+        #     action="TICKET CREATED",
+        #     user_id=current_user.id,
+        #     ticket_id=ticket.id,
+        #     new_value= ticket.title
+        #)
         
         background_tasks.add_task(
             HistorySevices.log_history,
@@ -111,7 +112,7 @@ class TicketServices:
         return tickets
 
     @staticmethod
-    async def update_ticket(db:Session,ticket:Ticket,ticket_data:TicketUpdate,current_user_id:int):
+    def update_ticket(db:Session,ticket:Ticket,ticket_data:TicketUpdate,current_user_id:int):
         old_status = ticket.status
         update_data = ticket_data.model_dump(exclude_unset=True)
         for key, value in update_data.items():
@@ -119,6 +120,7 @@ class TicketServices:
 
         db.commit()
         db.refresh(ticket)
+        CacheService.delete("dashboard_summary")
         # STATUS CHANGES LOGS
         if old_status != ticket.status:
             HistorySevices.log_history(
@@ -129,7 +131,8 @@ class TicketServices:
             old_value=old_status,
             new_value=ticket.status
             )
-            await EmailServices.send_mail(
+            BackgroundTasks.add_task(
+                EmailServices.send_mail,
                 recipient="puneethkumarg96@gmail.com",
                 subject="Ticket Status Updated",
                 body= f"""
@@ -137,7 +140,7 @@ class TicketServices:
                     Status changed to
                     {ticket.status}
                     """
-                )
+            )
         return ticket
     
     @staticmethod

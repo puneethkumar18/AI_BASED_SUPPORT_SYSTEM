@@ -2,6 +2,7 @@ from sqlalchemy.orm import Session
 
 from app.models.knowledge_base import KnowledgeBase
 from app.schemas.knowledge import (KnowledgeCreate,KnowledgeResponse,KnowledgeUpdate)
+from app.services.cache_services import CacheService
 
 class KnowledgeServices:
     @staticmethod
@@ -9,10 +10,13 @@ class KnowledgeServices:
         article = KnowledgeBase(
             **data.model_dump()
         )
-
         db.add(article)
         db.commit()
         db.refresh(article)
+        CacheService.set(
+            f"knowledge:{article.id}",
+            article
+        )
         return article
     
     @staticmethod
@@ -22,6 +26,11 @@ class KnowledgeServices:
     
     @staticmethod
     def get_by_id(db:Session,article_id: int):
+        article = CacheService.get(
+                f"knowledge:{article_id}"
+            )
+        if article:
+            return article
         article = db.query(KnowledgeBase).filter(KnowledgeBase.id == article_id).first()
         return article
     

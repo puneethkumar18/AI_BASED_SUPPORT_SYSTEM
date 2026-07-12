@@ -3,18 +3,24 @@ from app.models.ticket import Ticket
 from app.core.enums import TicketStatus
 from sqlalchemy import func
 from app.models.user import User
+from app.services.cache_services import CacheService
 
 
 class DashboardService:
 
     @staticmethod
-    def get_summery(db:Session):
-        return {
+    def get_summary(db:Session):
+        cached = CacheService.get("dashboard_summary")
+        if cached:
+            return cached
+        summary = {
             "total_tickets":db.query(Ticket).count(),
             "open_tickets":db.query(Ticket).filter(Ticket.status == TicketStatus.OPEN).count(),
             "in_progress":db.query(Ticket).filter(Ticket.status == TicketStatus.IN_PROGRESS).count(),
             "closed":db.query(Ticket).filter(Ticket.status == TicketStatus.CLOSED).count()
         }
+        CacheService.set("dashboard_summary",summary)
+        return summary
     
 
     @staticmethod
