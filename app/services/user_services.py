@@ -1,7 +1,8 @@
 from app.auth.hashing import hash_password,verify_password
 from app.models.user import User
-from app.schemas.user import UserRegister,UserLogin
+from app.schemas.user import UserRegister
 from sqlalchemy.orm import Session
+from app.core.logger import logger
 
 class UserService:
 
@@ -39,8 +40,19 @@ class UserService:
     def authenticate_user(db:Session,email:str,password:str):
         user = UserService.get_user_by_email(db,email)
         if not user:
+            logger.warning(
+                "Failed login attempt for %s",
+                email
+            )
             return None
         if not verify_password(password,user.password_hash):
+            logger.warning(
+                "Failed login attempt for %s",
+                email
+            )
             return None
-
+        logger.info(
+            "User %s logged in",
+                user.email
+            )
         return user

@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session
 from app.models.ticket import Ticket
 from app.models.user import User
 from app.models.attachment import Attachment
+from app.core.logger import logger
 
 class AttachmentService:
     @staticmethod
@@ -21,5 +22,8 @@ class AttachmentService:
         db.add(attachment)
         db.commit()
         db.refresh(attachment)
-
+        logger.info(
+            "Attachment uploaded %s",
+            attachment.original_filename
+        )
         return attachment

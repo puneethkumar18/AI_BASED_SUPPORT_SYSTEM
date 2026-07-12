@@ -1,4 +1,4 @@
-from fastapi import APIRouter,status,HTTPException,Depends
+from fastapi import APIRouter,status,HTTPException,Depends,BackgroundTasks
 from sqlalchemy.orm import Session
 from app.database.database import get_db
 from app.models.user import User
@@ -20,9 +20,10 @@ router = APIRouter(
 @router.post("",response_model=TicketResponse,status_code=status.HTTP_201_CREATED)
 async def create_ticket(
     ticket:TicketCreate,
+    background_tasks: BackgroundTasks,
     db:Session = Depends(get_db),
     current_user:User=Depends(require_roles(RoleEnum.ADMIN,RoleEnum.CUSTOMER,RoleEnum.SUPPORT_AGENT))):
-    return await TicketServices.create_ticket(db,ticket,current_user)
+    return TicketServices.create_ticket(db,ticket,current_user,background_tasks)
 
 @router.get("",response_model=List[TicketResponse])
 def get_all_tickets(

@@ -1,4 +1,4 @@
-
+from app.core.logger import logger
 
 class AIServices:
 
@@ -22,6 +22,7 @@ class AIServices:
             priority = "HIGH"
             suggestion = "Check firewall and network availability."
 
+        
         return {
             "category": category,
             "priority": priority,

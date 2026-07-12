@@ -6,17 +6,24 @@ from app.services.history_service import HistorySevices
 from app.services.email_services import EmailServices
 from app.models.ticket import Ticket
 from app.core.enums import RoleEnum
+from app.core.logger import logger
+from fastapi import BackgroundTasks
 
 class TicketServices:
 
     @staticmethod
-    async def create_ticket(db:Session,ticket_data:TicketCreate,current_user:User):
+    def create_ticket(
+        db:Session,
+        ticket_data:TicketCreate,
+        current_user:User,
+        background_tasks: BackgroundTasks):
         # ticket = Ticket(
         #     title=ticket_data.title,
         #     description = ticket_data.description,
         #     created_by = current_user.id
         # )
         analysis = AIServices.analyze_ticket(ticket_data.title,ticket_data.description)
+
         ticket = Ticket(
             **ticket_data.model_dump(),
             category=analysis["category"],
@@ -25,21 +32,53 @@ class TicketServices:
             suggested_resolution=analysis["suggested_resolution"],
             created_by = current_user.id
         )
-        await EmailServices.send_mail(
-            recipient="puneethkumarg96@gmail.com",
-            subject="Ticket Created Successfully",
-            body=f"""
+        db.add(ticket)
+        db.commit()
+        db.refresh(ticket)
+
+        background_tasks.add_task(
+            logger.info,
+            "AI categorized ticket %s as %s",
+            ticket.id,
+            ticket.category
+        )
+        background_tasks.add_task(
+            EmailServices.send_mail,
+            "puneethkumarg96@gmail.com",
+            "Ticket Created Successfully",
+            f"""
                 <h2>Ticket Created</h2>
                 Ticket #{ticket.id}
                 Title : {ticket.title}
                 Status : {ticket.status}
                 """
         )
-
-        db.add(ticket)
-        db.commit()
-        db.refresh(ticket)
-
+        # logger.info(
+        #     "AI categorized ticket %s as %s",
+        #     ticket.id,
+        #     ticket.category
+        # )
+        # await EmailServices.send_mail(
+        #     recipient="puneethkumarg96@gmail.com",
+        #     subject="Ticket Created Successfully",
+        #     body=f"""
+        #         <h2>Ticket Created</h2>
+        #         Ticket #{ticket.id}
+        #         Title : {ticket.title}
+        #         Status : {ticket.status}
+        #         """
+        # )
+        background_tasks.add_task(
+            logger.info,
+            "Ticket %s created by user %s",
+            ticket.id,
+            current_user.id,
+        )
+        # logger.info(
+        #     "Ticket %s created by user %s",
+        #     ticket.id,
+        #     current_user.id
+        # )
         HistorySevices.log_history(
             db=db,
             action="TICKET CREATED",
@@ -48,7 +87,14 @@ class TicketServices:
             new_value= ticket.title
         )
         
-
+        background_tasks.add_task(
+            HistorySevices.log_history,
+            db =db,
+            action="TICKET CREATED",
+            user_id=current_user.id,
+            ticket_id=ticket.id,
+            new_value= ticket.title
+        )
         return ticket
 
     @staticmethod
