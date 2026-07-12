@@ -8,6 +8,8 @@ from app.schemas.ticket import (TicketResponse,TicketUpdate,TicketCreate,AssignT
 from typing import List
 from app.core.enums import RoleEnum
 
+from app.exceptions.custom_exception import *
+
 
 router = APIRouter(
     prefix="/tickets",
@@ -68,9 +70,7 @@ def update_ticket(
     ticket = TicketServices.get_ticket_by_id(db,ticket_id)
 
     if ticket is None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Ticket Not Found")
+        raise TicketNotFoundException()
     
     if ticket.created_by != current_user.id:
         raise HTTPException(
@@ -91,10 +91,7 @@ def assign_ticket(
     ):
     ticket = TicketServices.get_ticket_by_id(db,ticket_id)
     if ticket is None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Ticket does not Exists"
-        )
+        raise TicketNotFoundException
     return TicketServices.assign_ticket(db,ticket,assignment.assigned_to,current_user.id)
 
 

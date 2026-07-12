@@ -8,6 +8,10 @@ from app.routers.comment import router as comment_router
 from app.routers.user import router as user_router
 from app.routers.history import router as history_router
 from app.routers.dashboard import router as dashboard_router
+from app.routers.attachment import router as attachment_router
+
+
+from app.exceptions.handler import *
 
 
 
@@ -20,6 +24,20 @@ app.include_router(knowledge_router)
 app.include_router(comment_router)
 app.include_router(history_router)
 app.include_router(dashboard_router)
+app.include_router(attachment_router)
+
+app.add_exception_handler(
+    TicketNotFoundException,
+    ticket_not_found_handler
+)
+app.add_exception_handler(
+    UserNotFoundException,
+    user_not_found_handler
+)
+app.add_exception_handler(
+    KnowledgeNotFoundException,
+    knowledge_not_found_handler
+)
 
 
 

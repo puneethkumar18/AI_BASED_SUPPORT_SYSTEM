@@ -26,5 +26,6 @@ class Ticket(Base):
     creator = relationship("User",foreign_keys=[created_by],back_populates="created_tickets")
     assignee = relationship("User",foreign_keys=[assiged_to])
     comments = relationship("Comment",back_populates="ticket",cascade="all, delete-orphan")
+    attachments = relationship("Attachment",back_populates="ticket",cascade="all, delete-orphan")
     history = relationship("TicketHistory",back_populates="ticket",cascade="all, delete-orphan")
     
