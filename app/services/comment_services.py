@@ -34,3 +34,13 @@ class CommentServices:
                     .order_by(Comment.created_at.asc())
                     .all())
         return comments
+    
+
+    @staticmethod
+    def delete_comment(db:Session,comment_id:int):
+        comment = db.query(Comment).get(Comment.id == comment_id)
+        db.delete(comment)
+        db.commit()
+        return {
+            "messgae":"Comment has been deleted"
+        }

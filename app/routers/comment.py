@@ -46,3 +46,9 @@ def get_comments(
     
     return comments
 
+@router.delete("/comments/{comment_id}")
+def delete_comment(
+    comment_id:int,
+    db:Session=Depends(get_db),
+    current_user = Depends(require_roles(RoleEnum.ADMIN))):
+    return CommentServices.delete_comment(db,comment_id)

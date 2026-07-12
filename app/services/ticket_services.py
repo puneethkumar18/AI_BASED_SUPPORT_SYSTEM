@@ -52,6 +52,9 @@ class TicketServices:
         return ticket
 
     @staticmethod
+    def get_all_tickets(db:Session):
+        return db.query(Ticket).all()
+    @staticmethod
     def get_ticket_by_id(db:Session,ticket_id:int):
         ticket = db.query(Ticket).filter(Ticket.id == ticket_id).first()
         return ticket

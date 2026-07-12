@@ -4,13 +4,17 @@ from sqlalchemy.orm import Session
 from app.database.database import get_db
 from app.services.dashboard_services import DashboardService
 from typing import List
+from app.auth.dependencies import require_roles
+from app.core.enums import RoleEnum
 
 
 router = APIRouter(prefix="/dashboard",tags=["Dashboard"])
 
 
 @router.get("/summery",response_model=DashboardSummary)
-def dashboard_summry(db:Session=Depends(get_db)):
+def dashboard_summry(
+    db:Session=Depends(get_db),
+    current_user = Depends(require_roles(RoleEnum.ADMIN,RoleEnum.SUPPORT_AGENT))):
     return DashboardService.get_summery(db)
 
 @router.get("/priority",response_model=List[PriorityStatistics])

@@ -19,16 +19,30 @@ router = APIRouter(
 async def create_ticket(
     ticket:TicketCreate,
     db:Session = Depends(get_db),
-    current_user:User=Depends(require_roles(RoleEnum.ADMIN,RoleEnum.CUSTOMER))):
+    current_user:User=Depends(require_roles(RoleEnum.ADMIN,RoleEnum.CUSTOMER,RoleEnum.SUPPORT_AGENT))):
     return await TicketServices.create_ticket(db,ticket,current_user)
 
+@router.get("",response_model=List[TicketResponse])
+def get_all_tickets(
+    db:Session=Depends(get_db),
+    current_user:User=Depends(require_roles(RoleEnum.ADMIN,RoleEnum.CUSTOMER,RoleEnum.SUPPORT_AGENT))
+    ):
+    return TicketServices.get_all_tickets(db)
+
 @router.get("/my",response_model=List[TicketResponse])
-def get_my_tickets(current_user:User=Depends(get_current_user),db:Session=Depends(get_db)):
+def get_my_tickets(
+    db:Session=Depends(get_db),
+    current_user:User=Depends(require_roles(RoleEnum.CUSTOMER,RoleEnum.ADMIN,RoleEnum.SUPPORT_AGENT))
+    ):
     tickets=TicketServices.get_my_tickets(db,current_user)
     return tickets
 
 @router.get("/{ticket_id}",response_model=TicketResponse)
-def get_ticket(ticket_id:int,db:Session=Depends(get_db),current_user:User=Depends(get_current_user)):
+def get_ticket(
+    ticket_id:int,
+    db:Session=Depends(get_db),
+    current_user:User=Depends(require_roles(RoleEnum.ADMIN,RoleEnum.SUPPORT_AGENT))
+    ):
     ticket = TicketServices.get_ticket_by_id(db,ticket_id)
 
     if ticket is None:
