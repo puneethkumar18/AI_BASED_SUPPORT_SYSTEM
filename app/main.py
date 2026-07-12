@@ -7,6 +7,7 @@ from app.routers.knowledge import router as knowledge_router
 from app.routers.comment import router as comment_router
 from app.routers.user import router as user_router
 from app.routers.history import router as history_router
+from app.routers.dashboard import router as dashboard_router
 
 
 
@@ -18,6 +19,7 @@ app.include_router(ticket_router)
 app.include_router(knowledge_router)
 app.include_router(comment_router)
 app.include_router(history_router)
+app.include_router(dashboard_router)
 
 
 
