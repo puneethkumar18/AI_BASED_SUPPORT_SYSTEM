@@ -12,7 +12,6 @@ venv/
 .env
 
 # Alembic cache
-alembic
 alembic/__pycache__/
 
 # VS Code
