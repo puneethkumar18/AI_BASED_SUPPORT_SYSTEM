@@ -11,7 +11,7 @@ class DashboardService:
     @staticmethod
     def get_summary(db:Session):
         cached = CacheService.get("dashboard_summary")
-        if cached:
+        if cached != None:
             return cached
         summary = {
             "total_tickets":db.query(Ticket).count(),

@@ -14,7 +14,8 @@ class CacheService:
     
     @staticmethod
     def set(key:str,value,ttl: int = 300):
-        redis_client.set(key,value,ttl)
+
+        redis_client.set(key,json.dumps(value),ttl)
 
     @staticmethod
     def delete(key:str):

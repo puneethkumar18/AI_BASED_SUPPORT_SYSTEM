@@ -11,11 +11,11 @@ from app.core.enums import RoleEnum
 router = APIRouter(prefix="/dashboard",tags=["Dashboard"])
 
 
-@router.get("/summery",response_model=DashboardSummary)
-def dashboard_summry(
+@router.get("/summary",response_model=DashboardSummary)
+def dashboard_summary(
     db:Session=Depends(get_db),
     current_user = Depends(require_roles(RoleEnum.ADMIN,RoleEnum.SUPPORT_AGENT))):
-    return DashboardService.get_summery(db)
+    return DashboardService.get_summary(db)
 
 @router.get("/priority",response_model=List[PriorityStatistics])
 def priority_dashboard(db:Session=Depends(get_db)):

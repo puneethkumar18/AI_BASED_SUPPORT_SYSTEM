@@ -13,6 +13,12 @@ class Settings(BaseSettings):
     MAIL_PORT: int
     MAIL_SERVER: str
 
+    REDIS_HOST:str
+    REDIS_PORT:int
+
+    CELERY_BROKER:str
+    CELERY_BACKEND:str
+
     model_config = SettingsConfigDict(
         env_file=".env",
         extra="ignore",

@@ -24,6 +24,6 @@ class AttachmentService:
         db.refresh(attachment)
         logger.info(
             "Attachment uploaded %s",
-            attachment.original_filename
+            attachment.stored_file_name
         )
         return attachment

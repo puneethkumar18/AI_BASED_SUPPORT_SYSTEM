@@ -1,11 +1,12 @@
 
 
 from celery import Celery
+from app.core.config import settings
 
 celery = Celery(
     "support_system",
-    broker="redis://localhost:6379/0",
-    backend="redis://localhost:6379/0")
+    broker=settings.CELERY_BROKER,
+    backend=settings.CELERY_BACKEND)
 
 celery.conf.update(
     task_serializer="json",
