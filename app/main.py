@@ -3,7 +3,6 @@ from app.database.database import engine
 
 from app.routers.auth import router as auth_router
 from app .routers.ticket import router as ticket_router
-from app.routers.knowledge import router as knowledge_router
 from app.routers.comment import router as comment_router
 from app.routers.user import router as user_router
 from app.routers.history import router as history_router
@@ -20,7 +19,6 @@ app = FastAPI()
 app.include_router(user_router)
 app.include_router(auth_router)
 app.include_router(ticket_router)
-app.include_router(knowledge_router)
 app.include_router(comment_router)
 app.include_router(history_router)
 app.include_router(dashboard_router)
@@ -39,7 +37,20 @@ app.add_exception_handler(
     knowledge_not_found_handler
 )
 
+app.add_exception_handler(
+    ValueErrorException,
+    invalid_user_exception_handler
+)
 
+app.add_exception_handler(
+    CommentNotFoundException,
+    comment_not_found_handler
+)
+
+app.add_exception_handler(
+    LLMException,
+    llm_exception
+)
 
 @app.get("/")
 def home():

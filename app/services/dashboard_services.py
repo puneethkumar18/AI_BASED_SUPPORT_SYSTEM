@@ -53,14 +53,14 @@ class DashboardService:
                 User.id,
                 User.name,
                 func.count(Ticket.id)).join(
-                    Ticket,Ticket.assiged_to == User.id).group_by(User.id,User.name).all()
+                    Ticket,Ticket.assigned_to == User.id).group_by(User.id,User.name).all()
         
         data = []
 
         for agent_id,name,assigned in result:
             closed = (db.query(Ticket)
                         .filter(
-                            Ticket.assiged_to == agent_id,
+                            Ticket.assigned_to == agent_id,
                             Ticket.status == TicketStatus.CLOSED)
                         ).count()
             

@@ -17,7 +17,7 @@ class TicketResponse(BaseModel):
     status:TicketStatus
     priority : TicketPriority
     category: Optional[str] = None
-    created_by : int
+    created_by :int
     assigned_to: Optional[int] = None
 
     model_config = ConfigDict(from_attributes=True)
@@ -27,11 +27,14 @@ class TicketUpdate(BaseModel):
     title:Optional[str] = None
     description:Optional[str] = None
     category:Optional[str] = None
-    status:Optional[TicketStatus]= None
     priority  : Optional[TicketPriority] = None
-    assiged_to : Optional[int] = None
+    assigned_to : Optional[int] = None
 
     model_config = ConfigDict(from_attributes=True)
+
+
+class TicketStatusUpdate(BaseModel):
+    status:TicketStatus
 
 
 class AssignTicket(BaseModel):

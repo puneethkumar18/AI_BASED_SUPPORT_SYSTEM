@@ -1,8 +1,8 @@
-"""correction in ticket history table
+"""fix spelling in ticket relationship with ticket history
 
-Revision ID: 4a3aa2372ed2
-Revises: fd2ea5c045b6
-Create Date: 2026-06-27 11:32:12.846339
+Revision ID: 68970cc217c4
+Revises: 00b071c697fb
+Create Date: 2026-09-23 04:55:07.946979
 
 """
 from typing import Sequence, Union
@@ -12,8 +12,8 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = '4a3aa2372ed2'
-down_revision: Union[str, Sequence[str], None] = 'fd2ea5c045b6'
+revision: str = '68970cc217c4'
+down_revision: Union[str, Sequence[str], None] = '00b071c697fb'
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
 

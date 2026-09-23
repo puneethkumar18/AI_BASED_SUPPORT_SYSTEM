@@ -1,4 +1,5 @@
 from app.core.celery_app import celery
+import asyncio
 
 from app.services.email_services import EmailServices
 
@@ -8,4 +9,13 @@ def send_ticket_created_email(
     subject: str,
     body: str
 ):
-    EmailServices.send_mail(recipient,subject,body)
+    
+    asyncio.run(EmailServices.send_email(recipient,subject,body))
+
+    return {
+        "status": "success",
+        "recipient": recipient,
+        "subject": subject,
+        "message": "Email sent successfully"
+    }
+    

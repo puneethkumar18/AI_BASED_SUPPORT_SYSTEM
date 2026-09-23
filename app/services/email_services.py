@@ -4,7 +4,7 @@ from app.core.mail import mail_config
 class EmailServices:
 
     @staticmethod
-    async def send_mail(
+    async def send_email(
         recipient: str,
         subject: str,
         body: str):

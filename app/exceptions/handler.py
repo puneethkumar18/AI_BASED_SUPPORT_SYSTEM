@@ -20,7 +20,7 @@ async def user_not_found_handler(request:Request,exc:UserNotFoundException):
         status_code=404,
         content={
             "success":False,
-            "message":exc.exc.message
+            "message":exc.message
         }
     )
 
@@ -31,5 +31,33 @@ async def knowledge_not_found_handler(request:Request,exc:KnowledgeNotFoundExcep
         content={
             "success":False,
             "message":exc.exc.message
+        }
+    )
+
+
+async def invalid_user_exception_handler(request:Request,exc:ValueErrorException):
+    return JSONResponse(
+        status_code=403,
+        content={
+            "success":False,
+            "message":exc.message
+        }
+    )
+
+async def comment_not_found_handler(request:Request,exc:CommentNotFoundException):
+    return JSONResponse(
+        status_code=404,
+        content={
+            "success":False,
+            "message":exc.message
+        }
+    )
+
+async def llm_exception(requst:Request,exc:LLMException):
+    return JSONResponse(
+        status_code=403,
+        content={
+            "success":False,
+            "message":exc.message
         }
     )

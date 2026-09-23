@@ -8,6 +8,7 @@ from app.schemas.comment import CommentCreate
 from app.services.comment_services import CommentServices
 from app.services.ticket_services import TicketServices
 from typing import List
+from fastapi import BackgroundTasks
 
 
 router = APIRouter(prefix="/tickets",tags=["Comments"])
@@ -16,6 +17,7 @@ router = APIRouter(prefix="/tickets",tags=["Comments"])
 def add_comment(
     ticket_id:int,
     comment_data:CommentCreate,
+    background_tasks:BackgroundTasks,
     db:Session = Depends(get_db),
     current_user = Depends(get_current_user)):
 
@@ -25,7 +27,12 @@ def add_comment(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Ticket is not Found"
         )
-    comment = CommentServices.add_comment(db,ticket,current_user,comment_data)
+    comment = CommentServices.add_comment(
+        db,ticket,
+        current_user,
+        comment_data,
+        background_tasks=background_tasks
+        )
 
     return comment
 
@@ -50,5 +57,5 @@ def get_comments(
 def delete_comment(
     comment_id:int,
     db:Session=Depends(get_db),
-    current_user = Depends(require_roles(RoleEnum.ADMIN))):
+    current_user = Depends(get_current_user)):
     return CommentServices.delete_comment(db,comment_id)

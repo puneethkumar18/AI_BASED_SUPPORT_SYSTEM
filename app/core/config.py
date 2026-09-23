@@ -18,6 +18,9 @@ class Settings(BaseSettings):
 
     CELERY_BROKER:str
     CELERY_BACKEND:str
+    GEMINI_API_KEY:str
+
+
 
     model_config = SettingsConfigDict(
         env_file=".env",

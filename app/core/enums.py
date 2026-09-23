@@ -8,6 +8,7 @@ class RoleEnum(str,Enum):
 class TicketStatus(str, Enum):
     OPEN = "OPEN"
     IN_PROGRESS = "IN_PROGRESS"
+    RESOLVED = "RESOLVED"
     CLOSED = "CLOSED"
 
 class TicketPriority(str, Enum):

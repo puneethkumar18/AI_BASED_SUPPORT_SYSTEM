@@ -30,6 +30,6 @@ class HistorySevices:
         return (
             db.query(TicketHistory)
             .filter(TicketHistory.ticket_id == ticket_id)
-            .order_by(TicketHistory.created_at.asc())
+            .order_by(TicketHistory.created_at.desc())
             .all()
         )
